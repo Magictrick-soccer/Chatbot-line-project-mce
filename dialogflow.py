@@ -5,6 +5,14 @@ from flask import Flask
 from flask import request
 from flask import make_response
 
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import firestore
+
+cred = credentials.Certificate("mr-spock-25e2d-firebase-adminsdk-npk8u-34c04c79cf.json")
+firebase_admin.initialize_app(cred)
+db = firestore.client()
+
 # Flask app should start in global layout
 app = Flask(__name__)
 
@@ -19,15 +27,16 @@ def webhook():
     return r
 
 def processRequest(req):
+
     # Parsing the POST request body into a dictionary for easy access.
     req_dict = json.loads(request.data)
-    print(req_dict)
+
     # Accessing the fields on the POST request boduy of API.ai invocation of the webhook
     intent = req_dict["queryResult"]["intent"]["displayName"]
 
-    if intent == 'ถามหนังน่าดู':
+    if intent == 'คะแนนสอบดูที่ไหน':
 
-        speech = "ได้เลย จัดให้!"
+        speech = 'ดูได้ที่กระดานชั้น 8'
 
     else:
 
@@ -37,13 +46,11 @@ def processRequest(req):
 
     return res
 
-
 def makeWebhookResult(speech):
 
     return {
   "fulfillmentText": speech
     }
-
 
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 5000))
@@ -51,3 +58,4 @@ if __name__ == '__main__':
     print("Starting app on port %d" % port)
 
     app.run(debug=False, port=port, host='0.0.0.0', threaded=True)
+
